@@ -9,6 +9,40 @@
             {{session('status')}}
         </div>
     @endif
+
+            <form action="{{route('users.index')}}">
+                <div class="row">
+                    <div class="col-md-6">
+                        <input
+                            value="{{Request::get('keyword')}}"
+                            name="keyword"
+                            class="form-control col-md-10"
+                            type="text"
+                            placeholder="Filter berdasarkan email"/>                   
+                    </div>
+                    <div class="col-md-6">
+                        <input {{Request::get('status') == 'ACTIVE' ? 'checked' : ''}}
+                            type="radio" 
+                            name="status" 
+                            id="active"
+                            value="ACTIVE"
+                            class="form-control">
+                        <label for="active">Active</label>
+
+                        <input {{Request::get('status') == 'INACTIVE' ? 'checked' : ''}}
+                            type="radio" 
+                            name="status" 
+                            id="inactive"
+                            value="INACTIVE"
+                            class="form-control">
+                        <label for="inactive">Inactive</label>
+
+                        <input type="submit" value="Filter" class="btn btn-primary">
+                    </div>
+                </div>
+            </form>
+            <br>
+
     <table class="table table-bordered">
     <thead>
         <tr>
@@ -30,6 +64,17 @@
                 @else
                 N/A
                 @endif</td>
+                <td>
+                    @if($user->status == "ACTIVE")
+                    <span class="badge badge-success">
+                        {{$user->status}}
+                    </span>
+                @else
+                    <span class="badge badge-danger">
+                        {{$user->status}}
+                    </span>
+                @endif
+                </td>
             <td>
                 <a class="btn btn-info text-white btn-sm" href="{{route('users.edit', ['id'=>$user->id])}}">Edit</a>
                 <form
@@ -57,7 +102,14 @@
         </tr>
     @endforeach
     </tbody>
+    <!-- <tfoot>
+        <tr>
+            <td colspan="10">
+                {{$users->appends(Request::all())->links()}}
+            </td>
+        </tr>
+    </tfoot> -->
     </table>
-    {{ $users->links() }}
+    {{ $users->appends(Request::all())->links() }}
 
 @endsection

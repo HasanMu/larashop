@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\User;
 
 class UserController extends Controller
 {
@@ -11,9 +12,23 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = \App\User::paginate(2);
+        $users =User::paginate(2);
+
+        $filterKeyword = $request->get('keyword');
+        $status = $request->get('status');
+
+        if ($filterKeyword) {
+            if ($status) {
+                $users =User::where('email', 'LIKE', "%$filterKeyword%")->where('status', $status)->paginate(2);
+            } else {
+                $users =User::where('email', 'LIKE', "%$filterKeyword%")->paginate(2);
+            }
+        }
+        if ($status) {
+            $users =User::where('status', $status)->paginate(2);
+        }
 
         return view('users.index', ['users' => $users]);
     }
@@ -36,7 +51,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $new_user = new \App\User;
+        $new_user = newUser;
         $new_user->name = $request->get("name");
         $new_user->username = $request->get("username");
         $new_user->roles = json_encode($request->get("roles"));
@@ -51,6 +66,7 @@ class UserController extends Controller
         }
 
         $new_user->save();
+        
     }
 
     /**
@@ -61,7 +77,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = \App\User::findOrFail($id);
+        $user =User::findOrFail($id);
 
         return view('users.show', ['user' => $user]);
     }
@@ -74,7 +90,7 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        $user = \App\User::findOrFail($id);
+        $user =User::findOrFail($id);
 
         return view('users.edit', ['user' => $user]);
     }
@@ -88,22 +104,23 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = \App\User::findOrFail($id);
-
+        $user =User::findOrFail($id);
         $user->name = $request->get('name');
         $user->roles = json_encode($request->get('roles'));
         $user->address = $request->get('address');
         $user->phone = $request->get('phone');
+        $user->status = $request->get('status');
+        if($request->avatar)
+            if ($user->avatar && file_exists(storage_path('app/public/', $user->avatar))) {
+                \Storage::delete('public/'.$user->avatar);
+                $file = $request->file('avatar')->store('avatars', 'public');
+                $user->avatar = $file;
+            }
+            if ($user->avatar == !file_exists(storage_path('app/public/', $user->avatar))) {
+                $file = $request->file('avatar')->store('avatars', 'public');
+                $user->avatar = $file;
+            }
 
-        if ($user->avatar && file_exists(storage_path('app/public/', $user->avatar))) {
-            \Storage::delete('public/'.$user->avatar);
-            $file = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar = $file;
-        }
-        else{
-            $file = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar = $file;
-        }
 
         $user->save();
 
@@ -119,7 +136,7 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = \App\User::findOrFail($id);
+        $user = User::findOrFail($id);
 
         $user->delete();
 
