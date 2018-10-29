@@ -4,6 +4,16 @@
 
 @section('content')
 
+    @if(session('status'))
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-warning">
+                {{session('status')}}
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div class="row">
         <div class="col-md-6">
             <form action="{{route('categories.index')}}">
@@ -24,6 +34,16 @@
             </div>
             </form>
     </div>
+    <div class="col-md-6">
+            <ul class="nav nav-pills card-header-pills">
+                <li class="nav-item">
+                    <a class="nav-link active" href=" {{route('categories.index')}}">Published</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{route('categories.trash')}}">Trash</a>
+                </li>
+            </ul>
+        </div>
 </div>
 <hr class="my-3">
 
@@ -57,6 +77,25 @@
                     <a
                         href="{{route('categories.edit', ['id' => $category->id])}}"
                         class="btn btn-info btn-sm"> Edit </a>
+                    <a 
+                        class="btn btn-primary btn-sm"
+                        href="{{route('categories.show', ['id' => $category->id]) }}"> Detail </a>
+                    <form 
+                        action="{{ route('categories.destroy', ['id' => $category->id])}}" 
+                        onsumbit = "return confirm('Buang Kategori Ke Tong Sampah?')"
+                        class = "d-inline"
+                        method="post">
+                        @csrf
+
+                        <input  type="hidden" 
+                                name="_method" 
+                                value="DELETE">
+
+                        <input 
+                            type="submit" 
+                            value="Trash"
+                            class="btn btn-danger btn-sm">
+                    </form>
                     </td>
                 </tr>
             @endforeach

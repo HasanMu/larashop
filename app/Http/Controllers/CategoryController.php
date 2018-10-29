@@ -71,7 +71,9 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        //
+        $category = Category::findOrFail($id);
+
+        return view('categories.show', ['category' => $category]);
     }
 
     /**
@@ -82,9 +84,9 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-        $category_to_edit = Category::findOrFail($id);
+        $category = Category::findOrFail($id);
 
-        return view('categories.edit', ['category' => $category_to_edit->id]);
+        return view('categories.edit',compact('category'));
     }
 
     /**
@@ -128,6 +130,43 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $category = Category::findOrFail($id);
+
+        $category->delete();
+
+        return redirect()->route('categories.index')->with('status', 'Category successfully moved to trash');
     }
+
+    public function trash()
+    {
+        $deleted_category = Category::onlyTrashed()->paginate(10);
+        
+        return view('categories.trash', ['categories' => $deleted_category]);
+    }
+
+    public function restore($id)
+    {
+        $category = Category::withTrashed()->findOrFail($id);
+
+        if ($category->trashed()) {
+            $category->restore();
+        } else {
+            return redirect()->route('categories.index')->with('status', 'Category is not in trash');
+        }
+
+        return redirect()->route('categories.index')->with('status', 'Category successfully restored');
+    }
+
+    public function deletePermanent($id)
+    {
+        $category = Category::withTrashed()->findOrFail($id);
+
+        if(!$category->trashed()):
+            return redirect()->view('categories.index')->with('status', 'Can not delete permanent active categoriy');
+        else :
+            $category->forceDelete();
+            return redirect()->view('categories.index')->with('status', 'Category permanently deleted');
+        endif;
+    }
+    
 }

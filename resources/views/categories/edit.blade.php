@@ -12,7 +12,7 @@
 
     <div class="col-md-8">
         <form
-            action="{{ route('categories.update', ['id'=>$category->id])}}"
+            action="{{ route('categories.update',$category->id)}}"
             method="POST"
             enctype="multipart/form-data"
             class="bg-white shadow-sm p-3">
