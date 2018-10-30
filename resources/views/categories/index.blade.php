@@ -45,7 +45,15 @@
             </ul>
         </div>
 </div>
+        
 <hr class="my-3">
+        
+    <div class="row">
+        <div class="col-md-12 text-right">
+        <a href="{{route('categories.create')}}" class="btn btn-primary">Create category</a>
+        </div>
+    </div>
+    <p></p>
 
     <div class="row">
         <div class="col-md-12">

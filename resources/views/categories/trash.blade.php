@@ -42,6 +42,7 @@
 
             <div class="row">
                 <div class="col-md-12">
+                
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -65,6 +66,22 @@
                                 <a 
                                     href="{{route('categories.restore', ['id' => $category->id])}}" 
                                     class="btn btn-success">Restore</a>
+                                <form
+                                    class="d-inline"
+                                    action="{{route('categories.delete-permanent', ['id' => $category->id])}}"
+                                    method="POST"
+                                    onsubmit="return confirm('Delete this category permanently?')">
+                                @csrf
+                                    <input
+                                        type="hidden"
+                                        name="_method"
+                                        value="DELETE"/>
+
+                                    <input
+                                        type="submit"
+                                        class="btn btn-danger "
+                                        value="Delete"/>
+                                </form>
                             </td>
                         </tr>
                     @endforeach

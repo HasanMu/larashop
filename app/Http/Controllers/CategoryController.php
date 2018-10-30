@@ -16,11 +16,11 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $categories = Category::paginate(2);
+        $categories = Category::paginate(4);
         $filterKeyword = $request->get('name');
 
         if ($filterKeyword) {
-            $categories = Category::where('name', 'LIKE', "%$filterKeyword%")->paginate(3);
+            $categories = Category::where('name', 'LIKE', "%$filterKeyword%")->paginate(4);
         }
 
         return view('categories.index', ['categories' => $categories]);
@@ -162,11 +162,17 @@ class CategoryController extends Controller
         $category = Category::withTrashed()->findOrFail($id);
 
         if(!$category->trashed()):
-            return redirect()->view('categories.index')->with('status', 'Can not delete permanent active categoriy');
+            return redirect()->route('categories.index')->with('status', 'Can not delete permanent active category');
         else :
             $category->forceDelete();
-            return redirect()->view('categories.index')->with('status', 'Category permanently deleted');
+            return redirect()->route('categories.index')->with('status', 'Category permanently deleted');
         endif;
     }
     
+    public function ajaxSearch(Request $request){
+        $keyword = $request->get('q');
+        
+        $categories = Category::where("name", "LIKE", "%$keyword%")->get();
+        return $categories;
+    }
 }
